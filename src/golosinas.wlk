@@ -23,16 +23,11 @@ class Bombon {
 }
 
 class BombonDuro inherits Bombon {
-	override method mordisco() {
-		peso -= 1
-	}
-	method dureza(){
-		var dureza
-		if(peso > 12) {dureza = 3}
-		else if(peso.between(8,12)) {dureza = 2}
-		else {dureza = 1}
-		return dureza
-	}
+	override method mordisco() {1.max(super() - 1)}
+	method dureza() =
+		if(peso > 12) 3
+		else if(peso.between(8,12)) 2
+		else 1
 }
 
 class Alfajor {
@@ -47,14 +42,21 @@ class Alfajor {
 
 class Caramelo {
 	var peso = 5
+	var property sabor
 
 	method precio() { return 12 }
 	method peso() { return peso }
 	method mordisco() { peso = peso - 1 }
-	method sabor() { return frutilla }
 	method libreGluten() { return true }
 }
 
+class CarameloConCorazonDeChocolate inherits Caramelo{
+	override method mordisco(){
+		super()
+		self.sabor(chocolate)
+	}
+	override method precio() = super() + 1
+}
 
 class Chupetin {
 	var peso = 7
@@ -88,6 +90,16 @@ class Oblea {
 	method libreGluten() { return false }
 }
 
+class ObleaCrujiente inherits Oblea{
+	var cantMordiscos = 0
+	override method mordisco(){
+		super()
+		cantMordiscos ++
+		if(cantMordiscos<=3) {peso -= 3}
+	}
+	method estaDebil() = cantMordiscos > 3
+}
+
 class Chocolatin {
 	// hay que acordarse de *dos* cosas, el peso inicial y el peso actual
 	// el precio se calcula a partir del precio inicial
@@ -102,6 +114,19 @@ class Chocolatin {
 	method sabor() { return chocolate }
 	method libreGluten() { return false }
 
+}
+
+class ChocolatinVIP inherits Chocolatin{
+	override method peso()= super() * (1 + self.humedad())
+	method humedad()= heladeraDeMariano.humedad()
+}
+
+class ChocolatePremium inherits ChocolatinVIP{
+	override method humedad() = super() / 2
+}
+
+object heladeraDeMariano{
+	var property humedad = 0
 }
 
 class GolosinaBaniada {
@@ -123,7 +148,7 @@ class GolosinaBaniada {
 
 class Tuttifrutti {
 	var libreDeGluten
-	var sabores = [frutilla, chocolate, naranja]
+	const sabores = [frutilla, chocolate, naranja]
 	var saborActual = 0
 	
 	method mordisco() { saborActual += 1 }	
@@ -136,10 +161,26 @@ class Tuttifrutti {
 }
 
 /*
-var bombon = new Bombon()		Bonbon
-bombon.mordisco() 				Bombon
-bombon.peso() 					Bombon
-bombon = new BombonDuro() 		BombonDuro
-bombon.mordisco() 				BombonDuro
-bombon.peso() 					BombonDuro
+var bombon = new Bombon()		 
+bombon.mordisco() 				Bombon -> X
+bombon.peso() 					Bombon -> X
+bombon = new BombonDuro() 		
+bombon.mordisco() 				BombonDuro -> X
+bombon.peso() 					BombonDuro -> Bombon
+ 
+var caramelo = new Caramelo() 		
+caramelo.mordisco() 				Caramelo -> X
+caramelo.peso() 					Caramelo -> X
+caramelo.sabor() 					Caramelo -> X
+caramelo = new CarameloRelleno() 	
+caramelo.mordisco() 				CarameloRelleno -> Caramelo
+caramelo.peso() 					CarameloRelleno -> Caramelo
+caramelo.sabor()					CarameloRelleno -> Caramelo
+
+var chocolatin = new Chocolatin() 	    
+chocolatin.peso() 						Chocolatin -> X
+chocolatin = new ChocolatinVIP() 		
+chocolatin.peso() 						ChocolatinVIP -> Chocolatin
+chocolatin = new ChocolatinPremium() 	
+chocolatin.peso() 						ChocolatinPremium -> ChocolatinVIP
  */
